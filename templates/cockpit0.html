@@ -1,0 +1,90 @@
+{%extends "layout.html"%}
+{%block content%}
+
+<div class="admin">
+<div class='jumbotron'>
+<div class="container">
+<p style="color:blue;">Symbol Creation</p>
+
+
+  <div class="row" >
+    <div class="col-md-1">
+    <label >Symbol</label>
+    </div>
+    <div class="col-md-3">
+      <select class="form-control" id =instrument>
+      </select>
+      <input type="hidden"  class="form-control" name="instrumentId" placeholder="Enter Car Id">
+    </div>
+  </div>
+
+  <br>
+  <table id='detTable' class="table table-striped" border="1">
+
+  </table>
+            <div class="row">
+              <br>
+                <div class="col-xs-6 col-sm-1 col-md-push-4">
+              <!-- <div class="text-center">  -->
+            <a href=# id=process_input><button id=process_input  class="btn btn-primary">Get Information</button></a>
+                </div>
+
+            </div>
+
+
+</div>
+</div>
+</div>
+
+<script>
+
+$(document).ready(function() {
+  $(window).load(function() {
+/////////////1111
+                 $.getJSON(
+                   '/getAllSymbols',
+                   function(data) {
+                     $('#instrument').find('option').remove();
+                       var option_item = '<option value="Select Symbol">Select Symbol</option>'
+                     $('#instrument').append(option_item);
+                     $.each(data.tradeSymbols, function(key, val) {
+                         var option_item = '<option value="' + val.Symbol_Id + '">' + val.Symbol_Description + '</option>'
+                         $('#instrument').append(option_item);
+
+                       });
+                   }
+                 );
+/////////////1111
+
+
+//=======
+$('a#process_input').click(function(){
+
+var instrumentText = $("#instrument option:selected").text();
+  $.getJSON(
+    '/tradelogic/business/getSymbolInfo',{
+// symbol  : instrumentText+'.r',
+symbol  : instrumentText,
+    },
+    function(data) {
+// window.location.href = '/display_SubmitConfirm?submitMessage=bid'+data.bid+' ask= '+data.ask
+
+
+$("#detTable table").remove();
+var trHTML = '';
+trHTML='<table class="table table-striped" ><tr><td><strong>Instrument</strong></td><td><strong>Bid</strong></td><td><strong>Ask</strong></td></tr>'
+
+// trHTML += '<tr><td><input type="text" size="5" maxlength="4" value =' + instrumentText+ '></td><td><input type="text" size="30" value =" ' + data.bid + '"></td><td> <input type="text" value= '+ data.ask + '></td></tr>';
+trHTML += '<tr><td>' + instrumentText+ '</td><td>' + data.bid + '</td><td> '+ data.ask + '</td></tr>';
+$('#detTable').append(trHTML);
+
+    });
+
+});
+//========
+
+  });
+
+        });
+</script>
+{%endblock%}

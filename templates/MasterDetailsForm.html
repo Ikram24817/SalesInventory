@@ -1,0 +1,47 @@
+{%extends "layout.html"%}
+{%block content%}
+<div class="admin">
+<div class='jumbotron'>
+<div class="container">
+<p style="color:blue;">Symbol Creation</p>
+<form method="POST" action="/createSymbolEntry">
+
+            <div class="row" >
+
+              <div class="col-md-1">
+              <label >Master Account No</label>
+              </div>
+              <div class="col-md-5">
+              <input type="number" name="masteraccno" maxlength="15" placeholder="Enter Account No"  />
+
+              </div>
+
+                      <div class="col-md-5">
+                          <label class="font-weight-bold" for="symbol">Master Account No</label>
+                          <input class="form-control" type="number" name="masteraccno" maxlength="15" placeholder="Enter Account No" autofocus="">
+                      </div>
+
+            </div>
+            <div class="row" >
+                  <!-- <div class="row"> -->
+                      <div class="col-md-5">
+                        <label class="font-weight-bold" for="symbolext">Symbol Extension</label>
+                          <input class="form-control" type="text" name="symbolext" maxlength="15" placeholder="Enter Symbol Extension" autofocus="">
+                      </div>
+                  <!-- </div> -->
+            </div>
+  <br>
+            <div class="row">
+              <br>
+                <div class="col-xs-6 col-sm-1 col-md-push-4">
+              <!-- <div class="text-center">  -->
+                 <button id=process_input  class="btn btn-primary">Create Symbol</button>
+                </div>
+
+            </div>
+
+</form>
+</div>
+</div>
+</div>
+{%endblock%}

@@ -1,0 +1,92 @@
+{%extends "layout.html"%}
+{%block content%}
+<!-- jquery plugin for datatables  -->
+
+<head>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+</head>
+<!--  -->
+<br>
+<br>
+<button id="addRow">Add new row</button>
+<button id="deleteRow">Delete row</button>
+    <table id="myTable" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Order Id</th>
+                <th>Instrument</th>
+                <th>Price</th>
+                <th>Stop Loss</th>
+                <th>Take Profit</th>
+            </tr>
+            <tbody>
+            {% if orders is defined and orders[0] is defined %}
+            {% for order in orders %}
+            <tr>
+                <td role='row'>{{order.Order_Id}}</td>
+                <td role='row'>{{order.Instrument}}</td>
+                <td role='row'>{{order.Entry_Point}}</td>
+                <td role='row'>{{order.Take_Profit}}</td>
+                <td role='row'>{{order.Stop_Loss}}</td>
+            </tr>
+            {% endfor %}
+            {% else %}
+          <tr><td role='row'><p> Do not have any list</p></td></tr>
+            {% endif %}
+
+          </tbody>
+        </thead>
+        <tfoot>
+            <tr>
+              <th>Order Id</th>
+              <th>Instrument</th>
+              <th>Price</th>
+              <th>Stop Loss</th>
+              <th>Take Profit</th>
+            </tr>
+        </tfoot>
+    </table>
+
+<script>
+    $(document).ready( function () {
+        $('#myTable').DataTable();
+
+        var t = $('#myTable').DataTable();
+          var counter = 1;
+
+          $('#addRow').on( 'click', function () {
+              t.row.add( [
+                  counter +'.1',
+                  counter +'.2',
+                  counter +'.3',
+                  counter +'.4',
+                  counter +'.5'
+              ] ).draw( false );
+
+              counter++;
+          } );
+
+          // Automatically add a first row of data
+          // $('#addRow').click();
+
+/// ===
+var table = $('#myTable').DataTable();
+$('#myTable tbody').on( 'click', 'tr', function () {
+        if ( $(this).hasClass('selected') ) {
+            $(this).removeClass('selected');
+        }
+        else {
+            table.$('tr.selected').removeClass('selected');
+            $(this).addClass('selected');
+        }
+    } );
+          $('#deleteRow').click( function () {
+       table.row('.selected').remove().draw( false );
+   } );
+/// ===
+
+
+    } );
+</script>
+{%endblock%}

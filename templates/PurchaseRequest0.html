@@ -1,0 +1,456 @@
+{%extends "layout.html"%}
+{%block content%}
+<body>
+<div class="home" style="background-color:#e1dfed;">
+              <div  class='jumbotron' style="background-color:#e1dfed;">
+                <p style="color:blue;">Purchase Request</p>
+                    <title>Purchase Request</title>
+                            <div class="form-group">
+                              <form>
+                                  <div class="row" >
+                                       <div class="form-group">
+                                         <div id="errMsg"></div>
+                                              <div class="col-md-5">
+                                                  <label title='Please enter name to search' width="50%">Enter Name</label>
+                                                  <input type=text size=100 class="form-control" id='custname'  name=customername  placeholder="Please enter the customer name to search " >
+                                                  <!-- <a href=# id=process_input><button class="btn btn-primary" >Search</button></a> -->
+                                                </div>
+
+                                  <!-- </div>
+                                  <div class="row" > -->
+                                        <div class="col-md-5">
+                                          <label  display:none> </label>
+                                          <br>
+                                        <a href=# ><button id =searchCust  class="btn btn-primary" >Search</button></a>
+                                        </div>
+                                      </div>
+                                    </div>
+                              </form>
+                              <p id=result></p>
+
+                                  <table class="table table-responsive" id='newTable' border="0" >
+                                  </table>
+                                  <table class="table table-responsive" id='t1' border="1" >
+                                  </table>
+
+                          <br>
+                                  <!-- <div id = displaycust style="display:none">
+                                            <table  border="1" >
+                                                          <tr><td><strong>Customer ID</td><td ><Input width="200px"  id="custId1"  /></td>
+                                                          <td><strong>Customer Name</td><td ><Input width="300px"  id="custName1" type="text"/> </td>
+                                                        <td><strong>Mobile No</td><td ><Input width="100px"  id="custmobile1"  /></td>
+                                                          <td><strong>Email</td><td ><Input width="300px"  id="emailid1"  /></td></tr>
+                                            </table>
+                                  </div> -->
+                                    <!-- <form action="/createInventoryData" method="post"> -->
+
+<table class="table table-borderless table-dark">
+  <thead>
+    <tr>
+      <th scope="col">Customer ID</th>
+      <th scope="col">Name</th>
+      <th scope="col">Address</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+
+      <td><input type="text" size =5 readonly class="form-control" name="custid" readonly></td>
+      <td><input type="text" size =5 readonly class="form-control" name="customerName"></td>
+      <td><input type="text" size =5 readonly class="form-control" name="address"></td>
+    </tr>
+
+  </tbody>
+</table>
+
+<table id='serviceTable' style="background-color:#a9b4cc;" class="table table-borderless table-warning">
+  <thead>
+    <tr>
+      <th scope="col">Item</th>
+      <th scope="col">GST %</th>
+      <th scope="col">Rate</th>
+      <th scope="col">Quantity</th>
+      <th scope="col">Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+    <div class="col-xs-8">
+              <select class="form-control" id =ItemCode>
+                <option value="Select Item">Select Item</option>
+                {% for value in itemCodes %}
+                  <option value="{{value.Item_Code}}">{{value.Item_Code}}--{{value.Item_Description}}</option>
+                {% endfor %}
+              </select>
+      </div>
+      <input  type="text" hidden name="itemId" >
+      <input  type="text" hidden name="hsncode" >
+      </td>
+      <!-- <td><input class="item"  type="text" size =5 readonly class="form-control" name="item1" readonly></td> -->
+
+
+    <div class="form-control">
+                  <td>
+                      <div class="col-xs-8">
+                          <input class="gst1" type="text" size =5 name="gst1">
+                      </div>
+                    </td>
+                      <td>
+                          <div class="col-xs-8">
+                            <input class="form-control" type="text" size =5   name="rate1">
+                          </div>
+                      </td>
+                    <td>
+                      <div class="col-xs-8">
+                        <input class="form-control" type="text" size =5  name="qty1">
+                      </div>
+                    </td>
+                    <td>
+                      <div class="col-xs-10">
+                        <input class="form-control" readonly type="text" size =5  name="total1">
+                      </div>
+                    </td>
+    </div>
+    </tr>
+
+  </tbody>
+</table>
+<!-- <div class="col-sm-8 col-sm-push-4"> -->
+<div  class="row" >
+  <div class="col-sm-8 col-sm-push-4">
+<a href=# id=dynamicTable><button class="btn btn-primary" >Add Item</button></a>
+  </div>
+</div>
+                                      <div class="row" >
+
+                                              <div class="col-md-5">
+                                                  <label for="hsncode">HSN Code</label>
+                                                  <input type="text" class="form-control"  readonly name="hsncode" >
+                                              </div>
+                                              <div class="col-md-5">
+                                                  <label for="hsndesc">HSN Percent</label>
+                                                  <input type="text" class="form-control" readonly name="hsnpercent" >
+                                              </div>
+                                      </div>
+                                      <div class="row" >
+
+                                            <div class="col-md-5">
+                                                        <label for="comments">Quantity</label>
+                                                        <input type="text" class="form-control" name="quantity" placeholder="Enter Quantity">
+                                            </div>
+                                              <div class="col-md-5">
+                                                  <label >Item Code</label>
+
+                                                    <select class="form-control" id =uom>
+                                                      <option value="Select Unit Of Measurement">Select Unit Of Measurement</option>
+                                                      {% for value in uom %}
+                                                        <option value="{{value.Unit_Id}}">{{value.Unit_Description}}</option>
+                                                      {% endfor %}
+                                                    </select>
+                                                    <input  type="text" hidden name="uomid" >
+
+
+                                        </div>
+                                        </div>
+                            <div class="row" >
+                                        <div class="col-md-5">
+                                            <label for="comments">Rate</label>
+                                            <input type="text" class="form-control" name="rate" placeholder="Enter Rate">
+                                        </div>
+                            </div>
+                            <div class="row" >
+                                        <div class="col-md-5">
+                                            <label for="comments">Comments</label>
+                                            <input type="text" class="form-control" name="comments" placeholder="Enter comments">
+                                        </div>
+                            </div>
+                                                      <!-- <br><br><br><br><br><br><br> -->
+                                                          <br>
+                                          <div class="row" >
+                                                      <br>
+                                                      <div class="col-sm-8 col-sm-push-4">
+                                                        <button  id=process_input class="btn btn-primary"  type="submit">Create Entry</button>
+                                                      </div>
+
+                                              </div>
+
+                                              <input type="text" hidden class="loginUserID" value ="{{current_user.id}}" size=1  name="loginUserID">
+
+                                        <!-- </form> -->
+                              </div>
+              </div>
+</div>
+
+</body>
+
+    </div>
+</div>
+
+	<script type=text/javascript>
+  $( document ).ready(function() {
+
+    $('#searchCust').click(function()
+    {
+      var name =$('input[name="customername"]').val().trim()
+      if (name == '') {
+        showErrorMessage("Please enter customer name to search")
+        return false;
+            }
+            else
+            {
+                       var errMsg = "<ul>";
+                       $("div#errMsg").html("");
+                   }
+            // else {
+              $.getJSON('/searchCustomers', {
+                customername: name,
+
+              }, function(data) {
+
+                          $("#newTable table").remove();
+                          var trHTML = '';
+                              trHTML='<table class="table table-striped" ><tbody style="display: block; border: 0px solid green; height: 100px; overflow-y: scroll"><tr><td><strong>Customer Id</strong></td><td><strong>Name</strong></td><td><strong>E Mail</strong></td>'
+
+                            custCount = 0
+                                    $.each(data.result, function(index, element)
+                                          {
+
+                                            custCount=custCount+1;
+                                              anTag = '<a href="#" class="cname1" title="'+element.Customer_Name+'"  data-name="'+element.Customer_Name+'">'+element.Customer_ID+'</a>'
+                                                            trHTML += '<tr><td>' +anTag+ '</td><td>' + element.Customer_Name + '</td><td>' + element.Customer_Email + '</td></tr>';
+
+                                          }
+                                        );
+                                        trHTML +='</tbody>'
+                                        if(custCount > 0)
+                                        {  $('#newTable').append(trHTML);}
+
+
+                           });
+            // }
+            return false;
+    });
+
+
+// --- on change for Item code
+$('#ItemCode').on('change', function()
+{
+   var ItemId = $('#ItemCode option:selected').val();
+   var $row = $(this).closest('tr'); //get the current row
+
+  alert($row.find('td').eq(1).text()); // change first cell
+   if( ItemId == 'Select Item' )
+  {
+           $('input[name="itemId"]').val('')
+           $('input[name="hsncode"]').val('')
+           $('input[name="gst1"]').val('')
+
+  }
+  if( ItemId != 'Select Item' )
+  {
+      $('input[name="itemId"]').val($('#ItemCode option:selected').val())
+
+      // $('input[name="itemdesc"]').val('')
+
+      ItemId      =   $('input[name="itemId"]').val();
+      $.getJSON(
+          '/getHSNCodePercentage',{
+            ItemId  : ItemId,
+          },
+          function(data) {
+            $('input[name="hsncode"]').val(data.code)
+            $('input[name="gst1"]').val(data.percent)
+            var thirdrowval = $(this).parent().siblings('td').eq(2).text();
+        alert(thirdrowval);
+
+          }
+        );
+  }
+
+
+});
+
+// --- on change for item code
+
+
+//------- function to populate the selected customer
+$(document).on("click", "a.cname1" , function() {
+  var name = $(this).data('name',);
+   event.preventDefault();
+  $.get("/get_customer_info", {'query': name}).done(function (data)
+  {
+    $('#displaycust').show();
+              $('#custid').val(data.custidj);
+              $('input[name="custid"]').val(data.custidj)
+              $('#customername').val(data.custnamej);
+              $('input[name="customerName"]').val(data.custnamej)
+              $('#address').val(data.custaddressj);
+              $('input[name="address"]').val(data.custaddressj)
+              // $('#emailid1').val(data.custemailj);
+              // $('#emailid1').val(data.custaddressj);
+      });
+      });
+//----
+
+/// for dynamic table a#dynamicTable, add the row for purchase items
+$('a#dynamicTable').click(function(){
+  var trHTML = '';
+  // trHTML='<table  class="table table-striped" ><tr><td><strong>Service Details</strong></td><td><strong>Comments</strong></td><td><strong>Amount</strong></td>'
+  // trHTML += '<tr><td><input type="text" class="details"   name="sDetails"></td><td><input type="text" class="comment" name="comments"></td><td><input type="text" class="amt" name="amount">&nbsp; <a href="javascript:void(0);" class="remCF">Remove</a></td>'
+  trHTML += '<tr><td><div class="col-xs-8"><select class="form-control" id =ItemCode>'+
+  '<option value="Select Item">Select Item</option>{% for value in itemCodes %}<option value="{{value.Item_Code}}">'+
+  '{{value.Item_Code}}--{{value.Item_Description}}</option>{% endfor %}</select></div></td>'+
+  '<div class="form-control"><td><div class="col-xs-8">'+
+  '<input class="form-control" type="text" size =5 name="gst1"> </div> </td> ' +
+  '<td><div class="col-xs-8"><input class="form-control" type="text" size =5   name="rate1"></div></td>'+
+  '<td><div class="col-xs-8"><input class="form-control" type="text" size =5  name="qty1"></div></td>'+
+  // '<td><div class="col-xs-10"><input class="form-control" readonly type="text" size =5  name="total1"></div></td></div>'+
+
+
+  '<td><div class="col-xs-10"><input type="text" class="form-control" size =5 name="amount">&nbsp;'+
+  ' <a href="javascript:void(0);" class="remCF">Remove</a></div></td></tr> '
+
+
+  $('#serviceTable').append(trHTML);
+  // sumAmount()
+
+});
+
+$("#serviceTable").on('click','.remCF',function(){
+        $(this).parent().parent().remove();
+         sumAmount()
+    });
+
+///////for dynamic table, add the row for purchase items
+
+    // $('#ItemCode').on('change', function()
+    // {
+    //    var ItemId = $('#ItemCode option:selected').val();
+    //   if( ItemId == 'Select Item' )
+    //
+    //   {
+    //  $('input[name="itemId"]').val('')
+    //  $('input[name="hsncode"]').val('')
+    //  $('input[name="hsnpercent"]').val('')
+    //
+    //   }
+    //   if( ItemId != 'Select Item' )
+    //   {
+    //       $('input[name="itemId"]').val($('#ItemCode option:selected').val())
+    //       $('input[name="itemdesc"]').val('')
+    //
+    //       ItemId      =   $('input[name="itemId"]').val();
+    //       $.getJSON(
+    //           '/getHSNCodePercentage',{
+    //             ItemId  : ItemId,
+    //           },
+    //           function(data) {
+    //             $('input[name="hsncode"]').val(data.code)
+    //             $('input[name="hsnpercent"]').val(data.percent)
+    //
+    //           }
+    //         );
+    //   }
+    //
+    //
+    // });
+
+     $('#process_input').click(function() {
+
+      var itemCode  =   $('input[name="itemId"]').val().trim();
+      var hsncode      =   $('input[name="hsncode"]').val().trim();
+      var quantity     =   $('input[name="quantity"]').val().trim();
+      var hsnpercent  =   $('input[name="hsnpercent"]').val().trim();
+      var quantity  =   $('input[name="quantity"]').val().trim();
+      var rate  =   $('input[name="rate"]').val().trim();
+      var comments  =   $('input[name="comments"]').val().trim();
+      var creatorID  =   $('input[name="loginUserID"]').val().trim();
+
+      var ItemId = $('#ItemCode option:selected').val();
+      var uom = $('#uom option:selected').val();
+
+      if (! $.isNumeric(hsnpercent))
+      {
+        showErrorMessage("Please enter numeric value for percentage ")
+        return false;
+      }
+      if (! $.isNumeric(hsnpercent))
+      {
+        showErrorMessage("Please enter numeric value for percentage ")
+        return false;
+      }
+      if (! $.isNumeric(quantity))
+      {
+        showErrorMessage("Please enter numeric value for quantity ")
+        return false;
+      }
+      if (! $.isNumeric(rate))
+      {
+        showErrorMessage("Please enter numeric value for rate ")
+        return false;
+      }
+      if (ItemId == 'Select Item'  ||  hsncode == '' |  hsnpercent == ''  || quantity == '' || uom == 'Select Unit Of Measurement' )
+                {
+
+                  showErrorMessage("HSN Code, Percentage, quantity and  Unit Of Measurement are  mandatory")
+                  return false;
+
+                }
+                else {
+                  $("#process_input").attr("disabled", true);
+                  $.getJSON(
+                                  // '/placeTradeInExchange',{
+                                  '/tradelogic/business/createInventory',{
+                                    // symbol  : instrumentText+'.r',
+                                    itemCode : itemCode,
+                                    hsncode  : hsncode,
+                                    quantity  : quantity,
+                                    comments  : comments,
+                                    uom  : uom,
+                                    creatorID : creatorID,
+                                    rate : rate,
+                                  },
+                                  function(data)
+                                   {
+                                      window.location.href = '/display_SubmitConfirm?submitMessage='+data.result
+                                    }
+                            );
+                }
+
+          });
+
+///function showErrorMessage
+          function showErrorMessage(errorMessage){
+
+          $.confirm({
+                         title: 'Encountered an error!',
+                         content: errorMessage,
+                         type: 'red',
+                         typeAnimated: true,
+                         buttons: {
+                             tryAgain: {
+                                 text: 'OK',
+                                 btnClass: 'btn-red',
+                                 action: function(){
+                                   // $( "#custname" ).focus();
+                                 }
+                             },
+                             close: function () {
+                             }
+                         }
+               });
+          // return false;
+          }
+
+          ///function showErrorMessage
+
+    });
+
+
+
+  </script>
+
+
+
+{%endblock%}

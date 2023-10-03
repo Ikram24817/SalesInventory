@@ -1,0 +1,242 @@
+{%extends "layout.html"%}
+{%block content%}
+
+  <div class='jumbotron'>
+<input type="hidden" name="userId"  value = {{name}}>
+          <h3 style="color:purple;" class="title">Shopping list</h3>
+              <title>Shopping List</title>
+                      <div class="form-group">
+                              <!-- <form action="/createShoppingList" method="post"> -->
+                                <div class="row" >
+                                                <div class="col-md-2">
+                                                    <label for="custName">Shopping List Title</label>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <input type="text"  maxlength="40" class="form-control" name="Shoppingtitle" placeholder="Enter Shopping List Title">
+                                                </div>
+
+                                </div>
+
+                                <div class="row" class="col-md-4">
+                                      <table height=100 class="table table-borderless" id='serviceTable'>
+                                        <tr><td><strong>Quantity</strong></td><td><strong>Product Name</strong></td><td></td><td></td></tr>
+                                        <tr><td><input type="text" size="5" maxlength="4" class="qty" name="qty"></td><td><input type="text" maxlength="30" class="product" name="product"></td>&nbsp;<td><input type="text" hidden class="amt" size=1  name="amount"></td><td> <a href="javascript:void(0);" class="remCF">Remove</a></td></tr>
+                                      </table>
+                                  <a href=# id=dynamicTable><button class="btn btn-secondary" ><span class="glyphicon glyphicon-plus"></span>Add row</button></a>
+                                </div>
+                              <!-- </form> -->
+                              <br>
+                              <div class="col-xs-6 col-sm-1 col-md-push-3">
+                                <a href=# id=getValue><button class="btn btn-primary" ><span class="glyphicon glyphicon-th-list"></span>&nbsp;Create Shopping List</button></a>
+                              </div>
+                      </div>
+
+    </div>
+
+
+<script type=text/javascript>
+$(document).ready(function() {
+
+  ///========= For numeric input on amount field
+
+
+  $(document).on('keyup', '.qty', function () {
+    jQuery('.qty').keyup(function () {
+        // this.value = this.value.replace(/[^0-9\.]/g,'');
+      this.value = this.value.match(/^\d+\.?\d{0,2}/);
+    });
+  });
+
+
+  ///========= For numeric input on amount field
+
+  /// for dynamic table a#dynamicTable
+  $('a#dynamicTable').click(function(){
+    $('#texs').remove();
+    var trHTML = '';
+    // trHTML='<table  class="table table-striped" ><tr><td><strong>Service Details</strong></td><td><strong>Comments</strong></td><td><strong>Amount</strong></td>'
+    trHTML += '<tr><td><input type="text" size="5" maxlength="4"  class="qty"   name="qty"></td><td><input type="text" maxlength="30" class="product" name="product"></td><td><input type="text" hidden class="amt" size=1  name="amount"></td>&nbsp;<td> <a href="javascript:void(0);" class="remCF">Remove</a></td></tr>'
+    $('#serviceTable').append(trHTML);
+
+    // sumAmount()
+
+  });
+  /// for dynamic table a#dynamicTable
+
+  $("#serviceTable").on('click','.remCF',function(){
+    count = 0
+    $("#serviceTable .amt").each(function () {
+      count = count+1
+      });
+      if (count ==1)
+      {
+        showErrorMessage("At lest One Row is required")
+        return false
+      }
+          $(this).parent().parent().remove();
+           // sumAmount()
+      });
+
+
+      /// new function
+      function sumAmount() {
+        var calculated_total_sum = 0;
+        $('#texs').remove();
+        $("#serviceTable .amt").each(function () {
+            var get_textbox_value = $(this).val();
+
+            if ($.isNumeric(get_textbox_value)) {
+               calculated_total_sum += parseFloat(get_textbox_value);
+               }
+             });
+             trHTML = '<tr id ="texs"><td></td><td></td><td>Total :'+calculated_total_sum+'</td></tr>'
+
+             $('#serviceTable').append(trHTML);
+        }
+      // new function
+
+
+      /// calculate the sum of Amount of all columns from the table
+
+       $("#serviceTable").on('input', '.amt', function () {
+
+         var calculated_total_sum = 0;
+       $('#texs').remove();
+         $("#serviceTable .amt").each(function () {
+             var get_textbox_value = $(this).val();
+
+             if ($.isNumeric(get_textbox_value)) {
+                calculated_total_sum += parseFloat(get_textbox_value);
+                }
+              });
+              trHTML = '<tr id ="texs"><td></td><td></td><td>Total :'+calculated_total_sum+'</td></tr>'
+
+              $('#serviceTable').append(trHTML);
+
+                   });
+
+      /// calculate the sum of Amount of all columns from the table
+
+// to get all products list from dymic table
+
+function getProductDetails() {
+var qty=new Array();
+var product=new Array();
+var amount=new Array();
+
+$('#serviceTable input[type="text"]').each(function () {
+
+    if($(this).attr('name')=="qty")
+        qty.push($(this).val())
+
+    if($(this).attr('name')=="product")
+        product.push($(this).val())
+
+
+    if($(this).attr('name')=="amount")
+        amount.push($(this).val())
+
+ });
+
+ // return { det : details, comm : comments, amt = amount };
+ return {  qty,  product,  amount };
+}
+
+//to get all products list from dymic table
+
+// Submit Data------------
+$('a#getValue').click(function(){
+emptyField = false
+notQtyIsNumeric = false
+  Shoppingtitle      =   $('input[name="Shoppingtitle"]').val();
+$("#serviceTable tr:gt(0)").each(function () {
+
+            quantity=   $(this).find('input[name*="qty"]').val()
+            Product_Description=   $(this).find('input[name*="product"]').val()
+        if( quantity == '' || Product_Description == '')
+            {
+                emptyField = true
+            }
+            if(!($.isNumeric(quantity)))
+            {
+              notQtyIsNumeric =  true
+            }
+
+});
+
+  if ( Shoppingtitle.trim() =='' )
+  {
+    showErrorMessage("Please enter shopping title")
+    return false;
+  }
+if ( emptyField )
+{
+  showErrorMessage("All fields are mandatory")
+  return false;
+}
+if ( notQtyIsNumeric )
+{
+  showErrorMessage("Quanity is a numeric field")
+  return false;
+}
+allValues = getProductDetails(),
+
+quantity = allValues.qty,
+product = allValues.product,
+amount  = allValues.amount,
+
+
+$.getJSON('/createShoppingList', {
+
+   sQuantity: JSON.stringify(quantity),
+   sProduct : JSON.stringify(product),
+   sAmount : JSON.stringify(amount),
+   sShoppingListName : $('input[name="Shoppingtitle"]').val(),
+   userId : $('input[name="userId"]').val()
+
+            }, function(data) {
+              window.location.href = '/display_SubmitConfirm?message='+data.result
+
+                        });
+
+return false;
+});
+//Submit Data------------
+
+
+// function showErrorMessage
+function showErrorMessage(errorMessage){
+
+  // var errorMessage = 'Please enter name to search'
+$.confirm({
+               title: 'Encountered an error!',
+               content: errorMessage,
+               type: 'red',
+               typeAnimated: true,
+               buttons: {
+                   tryAgain: {
+                       text: 'OK',
+                       btnClass: 'btn-red',
+                       action: function(){
+                         // $( "#custname" ).focus();
+                       }
+                   },
+                   close: function () {
+                   }
+               }
+     });
+
+return false;
+}
+//function showErrorMessage
+
+
+
+
+
+
+});
+
+</script>
+
+{%endblock%}

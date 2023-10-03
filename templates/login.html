@@ -1,0 +1,47 @@
+{%extends "layout.html"%}
+{%block content%}
+<div  class='jumbotron'>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    <div class="text-danger">
+      <b>  {{ messages[0] }}   </b>
+    </div>
+{% endif %}
+{% endwith %}
+
+
+    <div class="form-group">
+
+        <div class="column is-4 is-offset-4">
+            <h3 class="title">Login</h3>
+            <div class="box">
+                <form method="POST" action="/login_post">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label class="font-weight-bold" for="email">E-mail</label>
+                            <input class="form-control" type="email" name="email" placeholder="Your Email" autofocus="">
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                          <div class="col-md-5">
+                            <label class="font-weight-bold" for="password">Password</label>
+                            <input class="form-control" type="password" name="password" placeholder="Your Password">
+                        </div>
+                    </div>
+                    <br>
+                    <!-- <div class="field">
+                        <label class="checkbox">
+                            <input type="checkbox">
+                            Remember me
+                        </label>
+                    </div> -->
+                    <button class="btn btn-primary">Login</button>
+                </form>
+            </div>
+        </div>
+
+
+  </div>
+</div>
+{%endblock%}

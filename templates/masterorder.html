@@ -1,0 +1,421 @@
+{%extends "layout.html"%}
+{%block content%}
+<div class="admin">
+  <div class='jumbotron' style="background-color:#e0e8e5">
+    <div class="container">
+
+        <p style="color:blue;">Master Order Creation</p>
+        <!-- <form method="POST" action="/createSymbolEntry"> -->
+        <div class="row" >
+          <div class="col-md-1">
+          <label >Symbol</label>
+          </div>
+          <div class="col-md-3">
+            <select class="form-control" id =instrument>
+            </select>
+            <input type="hidden"  class="form-control" name="instrumentId" placeholder="Enter Car Id">
+          </div>
+        </div>
+
+        <br>
+
+        <div class="row" >
+          <div class="col-md-1">
+          <label >Type</label>
+          </div>
+          <div class="col-md-3">
+            <select class="form-control" id =trdtype>
+          </select>
+            <input type="hidden"  class="form-control" name="trdtypeId" >
+          </div>
+        </div>
+          <br>
+        <div class="row" >
+          <div class="col-md-1">
+          <label >Order Type</label>
+          </div>
+          <div class="col-md-3">
+            <select class="form-control" id =ordertype>
+          </select>
+            <input type="hidden"  class="form-control" name="ordertypeId">
+          </div>
+        </div>
+        <br>
+        <div id=eprice >
+        <div class="row" >
+          <div class="col-md-1">
+          <label >Price</label>
+          </div>
+          <div  class="col-md-5">
+          <input type="number" name="price" min="0.0000" max="10000.00" step="0.0001" />
+
+          </div>
+        </div>
+
+      </div>
+          <br>
+        <div class="row" >
+          <div class="col-md-1">
+          <label >Volume</label>
+          </div>
+          <div class="col-md-5">
+          <input type="number" name="volume" min="0.0000" max="10000.00" step="0.0001" />
+
+          </div>
+        </div>
+
+        <br>
+
+        <div class="row" >
+          <div class="col-md-1">
+          <label >Stop Loss</label>
+          </div>
+          <div class="col-md-5">
+          <input type="number" name="stoploss" min="0.0000" max="10000.00" step="0.0001" />
+          </div>
+          <div class="col-md-1">
+          <label >Take Profit</label>
+          </div>
+          <div class="col-md-5">
+          <input type="number" name="tp" min="0.0000" max="10000.00" step="0.0001" />
+          </div>
+        </div>
+        <!-- <div class="row" >
+
+                  <div class="col-md-1">
+                    <label class="font-weight-bold" for="symbolext">Fill or Kill</label>
+                  </div>
+                  <div class="col-md-5">
+                      <input class="form-control" type="text" name="fill" maxlength="15" placeholder="Enter Fill or kill" autofocus="">
+                  </div>
+          </div> -->
+        <div class="row" >
+                  <div class="col-md-1">
+                    <label class="font-weight-bold" for="symbolext">Comments</label>
+                  </div>
+                  <div class="col-md-5">
+                      <input class="form-control" type="text" name="comments" maxlength="15" placeholder="Enter Comments" autofocus="">
+                  </div>
+              <!-- </div> -->
+        </div>
+
+        <br>
+                  <div class="row">
+                    <br>
+                      <div class="col-xs-6 col-sm-1 col-md-push-4">
+                    <!-- <div class="text-center">  -->
+                    <a href=# id=submit_data><button id='wes' class="btn btn-primary" ><span class="glyphicon glyphicon-th-list"></span>&nbsp;Create Order</button></a>
+                       <!-- <button id=submit_data  class="btn btn-primary">Create Order</button> -->
+                      </div>
+
+                  </div>
+<input type="text" hidden class="loginUserID" value ="{{current_user.id}}" size=1  name="loginUserID">
+      <!-- </form> -->
+    <!-- </div> -->
+  </div>
+</div>
+
+
+
+<script>
+     $(document).ready(function() {
+       $(window).load(function() {
+/////////////1111
+                      $.getJSON(
+                        '/getAllSymbols',
+                        function(data) {
+                          $('#instrument').find('option').remove();
+                            var option_item = '<option value="Select Symbol">Select Symbol</option>'
+                          $('#instrument').append(option_item);
+                          $.each(data.tradeSymbols, function(key, val) {
+                            if(val.Symbol_Suffix.trim() != '')
+                            {
+                              symbol = val.Symbol_Description+'.'+val.Symbol_Suffix.trim()
+                            }
+                            else
+                            {
+                              symbol = val.Symbol_Description
+                            }
+
+
+                              var option_item = '<option value="' + val.Symbol_Id + '">' + symbol + '</option>'
+                              $('#instrument').append(option_item);
+
+                            });
+                        }
+                      );
+/////////////1111
+
+
+/////////////2222
+                  $.getJSON(
+                    '/getOrderTypes',
+                    function(data) {
+                      $('#trdtype').find('option').remove();
+                        var option_item = '<option value="Select Type">Select Type</option>'
+                      $('#trdtype').append(option_item);
+                      $.each(data.typesOfOrders, function(key, val) {
+                          var option_item = '<option value="' + val.Type_Id + '">' + val.Trade_Type_Description + '</option>'
+                          $('#trdtype').append(option_item);
+
+                        });
+                    }
+                  );
+
+/////////////2222
+
+///333
+$('#trdtype').on('change', function()
+{
+   var typeId = $('#trdtype option:selected').val();
+   if( typeId == 'Select Type' )
+   {
+     $('#ordertype').find('option').remove();
+       var option_item = '<option value="Select Order Type">Select Order Type</option>'
+         $('#ordertype').append(option_item);
+   }
+   if( typeId != 'Select Type' )
+
+   {
+        $.getJSON(
+            '/populateOrderTypes',{
+              mainTypeId  : typeId,
+            },
+            function(data) {
+
+              $('#ordertype').find('option').remove();
+                var option_item = '<option value="Select Order Type">Select Order Type</option>'
+              $('#ordertype').append(option_item);
+              $.each(data.result, function(key, val) {
+                  var option_item = '<option value="' + val.Order_Type_ID + '">' + val.Order_Description + '</option>'
+                  $('#ordertype').append(option_item);
+
+                });
+            }
+          );
+   }
+
+});
+///333
+
+///validate form
+
+function validateForm()
+{
+
+  var instrumentId = $('#instrument option:selected').val();
+  var instrumentText = $("#instrument option:selected").text();
+  var typeId = $('#trdtype option:selected').val();
+  var orderType = $('#ordertype option:selected').val();
+  var price   =   $('input[name="price"]').val();
+  var volume   =   $('input[name="volume"]').val();
+  var stopLoss   =   $('input[name="stoploss"]').val();
+  var takeProfit   =   $('input[name="tp"]').val();
+  var userId = $('input[name="loginUserID"]').val();
+  var type1Flag = ''
+  var type2Flag = ''
+  if ( instrumentId == 'Select Symbol' || instrumentId.trim() == '' )
+  {
+    showErrorMessage("Please select the Symbol")
+    return false;
+  }
+  if ( typeId == 'Select Type' || typeId.trim() == ''  )
+  {
+    showErrorMessage("Please select the Type")
+    return false;
+  }
+  if ( orderType == 'Select Order Type' || orderType.trim() == '')
+  {
+    showErrorMessage("Please select the Order Type")
+    return false;
+  }
+
+  if(typeId == '1')
+  {
+
+    if (  volume.trim() == '' || stopLoss.trim() == '' || takeProfit.trim() == '')
+    {
+      showErrorMessage("Price, volume, Stop Loss and Take Profit are mandatory")
+      return false;
+    }
+
+    if( !($.isNumeric(volume)) || !($.isNumeric(stopLoss))  || !($.isNumeric(takeProfit))  )
+    {
+      showErrorMessage("Price, volume, Stop Loss and Take Profit are Numeric")
+      return false;
+
+    }
+  }
+if(typeId == '2')
+{
+
+  if ( price.trim() == '' || volume.trim() == '' || stopLoss.trim() == '' || takeProfit.trim() == '')
+  {
+    showErrorMessage("Price, volume, Stop Loss and Take Profit are mandatory")
+    return false;
+  }
+
+  if(!($.isNumeric(price)) || !($.isNumeric(volume)) || !($.isNumeric(stopLoss))  || !($.isNumeric(takeProfit))  )
+  {
+    showErrorMessage("Price, volume, Stop Loss and Take Profit are Numeric")
+    return false;
+
+  }
+}
+$("#wes").attr("disabled", true);
+  $.getJSON(
+            '/tradelogic/business/getMarketPrice',{
+              symbol  : instrumentText,
+
+            },
+            function(data)
+            {
+
+                          marketPrice = data.CurrentMarketPrice;
+                          // alert(marketPrice)
+                        //  alert(typeId+' '+orderType+' '+(price)+' '+(marketPrice));
+                        if(marketPrice == 0)
+                        {
+                          showErrorMessage('Market price cant be zero')
+                          $("#wes").attr("disabled", false);
+                          return false;
+
+                        }
+
+                        if(typeId == '1' &&  stopLoss > marketPrice && orderType == '1'  )
+                        {
+                          showErrorMessage("Stop Loss is greater than Market price , Market order should be Sell ")
+                          type1Flag = 'greater'
+                          $("#wes").attr("disabled", false);
+                          return false;
+
+
+                        }
+
+                        if(typeId == '1' &&  stopLoss < marketPrice && orderType == '2'  )
+                        {
+                          showErrorMessage("Stop Loss is less than Market price , Market order should be Buy ")
+                          type1Flag = 'lesser'
+                          $("#wes").attr("disabled", false);
+                          return false;
+
+
+                        }
+
+              //     3 ="Buy Limit" ,,  6 ="Sell Stop"
+                        if(typeId == '2' &&  price > marketPrice && (orderType == '3' || orderType == '6' )  )
+                        {
+                          showErrorMessage("Entry Price is > Market price , Pending order should be Buy Stop or Sell Limit")
+                          type2Flag = 'greater'
+                          $("#wes").attr("disabled", false);
+                          return false;
+
+                        }
+
+                        //     4 ="Sell Limit" ,,  5 ="Buy Stop"
+                        if(typeId == '2' && (orderType == '4' || orderType == '5' ) &&  (price < marketPrice ))
+                        {
+                          showErrorMessage("Entry Price is < Market price , Pending order should be Buy Limit or Sell Stop");
+                          type2Flag = 'lesser'
+                          $("#wes").attr("disabled", false);
+                          return false;
+
+                        }
+
+                // return false;
+
+            // }
+        // );
+
+
+                                if(type2Flag == '' || type1Flag == '' )
+                                {
+                                      $.getJSON(
+                                                      // '/placeTradeInExchange',{
+                                                      '/tradelogic/business/placeTradeInExchange',{
+                                                        // symbol  : instrumentText+'.r',
+                                                        symbol  : instrumentText,
+                                                        symbolID : instrumentId,
+                                                        mainTypeId  : typeId,
+                                                        OrderTypeId  : orderType,
+                                                        tradePrice  : price,
+                                                        tradeVolume  : volume,
+                                                        tradeStopLoss  : stopLoss,
+                                                        tradeTakeProfit  : takeProfit,
+                                                        masterID : userId,
+                                                      },
+                                                      function(data)
+                                                       {
+                                                          window.location.href = '/display_SubmitConfirm?submitMessage='+data.result
+                                                        }
+                                                );
+
+                                }
+           }
+       );
+
+}
+
+/// validate form
+
+/// submit form
+$('a#submit_data').click(function(){
+validateForm()
+});
+
+
+/// submit form
+
+
+
+///function showErrorMessage
+
+function showErrorMessage(errorMessage){
+
+  // var errorMessage = 'Please enter name to search'
+$.confirm({
+               title: 'Encountered an error!',
+               content: errorMessage,
+               type: 'red',
+               typeAnimated: true,
+               buttons: {
+                   tryAgain: {
+                       text: 'OK',
+                       btnClass: 'btn-red',
+                       action: function(){
+
+                       }
+                   },
+                   close: function () {
+                   }
+               }
+     });
+return false;
+}
+
+///function showErrorMessage
+
+
+
+// hide function
+$(function() {
+    // $('#row_dim').hide();
+    var typeId = $('#trdtype option:selected').val();
+    $('#trdtype').change(function(){
+        if($('#trdtype').val() == '2') {
+            $('#eprice').show();
+        } else {
+            $('#eprice').hide();
+        }
+    });
+});
+
+//hide function
+
+
+  });
+
+        });
+</script>
+
+{%endblock%}

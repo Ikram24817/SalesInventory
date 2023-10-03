@@ -1,0 +1,1 @@
+ostgresql+psycopg2://postgres:ibrahim9999@localhost:5432/innovatif

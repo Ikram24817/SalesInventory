@@ -1,0 +1,234 @@
+
+{%extends "layout.html"%}
+{%block content%}
+<body>
+<div class="home" style="background-color:#e1dfed;">
+
+
+              <div  class='jumbotron' style="background-color:#e1dfed;">
+                <p style="color:blue;">Inventory Entry</p>
+                    <title>Inventory Entry</title>
+                            <div class="form-group">
+                                    <!-- <form action="/createInventoryData" method="post"> -->
+                                      <div class="row" >
+
+                                                            <div class="col-md-5">
+                                                          <label >Item Code</label>
+
+                                                            <select class="form-control" id =ItemCode>
+                                                              <option value="Select Item">Select Item</option>
+                                                              {% for value in itemCodes %}
+                                                                <option value="{{value.Item_Code}}">{{value.Item_Code}}--{{value.Item_Description}}</option>
+                                                              {% endfor %}
+                                                            </select>
+                                                            <input  type="text" hidden name="itemId" >
+
+                                                        </div>
+
+                                                      <div class="col-md-5">
+                                                          <label for="hsndesc">Item Description</label>
+                                                          <input type="text" class="form-control" name="itemdesc" placeholder="Enter Description">
+                                                      </div>
+
+                                      </div>
+                                      <div class="row" >
+
+                                              <div class="col-md-5">
+                                                  <label for="hsncode">HSN Code</label>
+                                                  <input type="text" class="form-control"  readonly name="hsncode" >
+                                              </div>
+                                              <div class="col-md-5">
+                                                  <label for="hsndesc">HSN Percent</label>
+                                                  <input type="text" class="form-control" readonly name="hsnpercent" >
+                                              </div>
+                                      </div>
+                                      <div class="row" >
+
+                                            <div class="col-md-5">
+                                                        <label for="comments">Quantity</label>
+                                                        <input type="text" class="form-control" name="quantity" placeholder="Enter Quantity">
+                                            </div>
+                                              <div class="col-md-5">
+                                                  <label >Item Code</label>
+
+                                                    <select class="form-control" id =uom>
+                                                      <option value="Select Unit Of Measurement">Select Unit Of Measurement</option>
+                                                      {% for value in uom %}
+                                                        <option value="{{value.Unit_Id}}">{{value.Unit_Description}}</option>
+                                                      {% endfor %}
+                                                    </select>
+                                                    <input  type="text" hidden name="uomid" >
+
+
+                                        </div>
+                                        </div>
+                            <div class="row" >
+                                        <div class="col-md-5">
+                                            <label for="comments">Rate</label>
+                                            <input type="text" class="form-control" name="rate" placeholder="Enter Rate">
+                                        </div>
+                            </div>
+                            <div class="row" >
+                                        <div class="col-md-5">
+                                            <label for="comments">Comments</label>
+                                            <input type="text" class="form-control" name="comments" placeholder="Enter comments">
+                                        </div>
+                            </div>
+                                                      <!-- <br><br><br><br><br><br><br> -->
+                                                          <br>
+                                          <div class="row" >
+                                                      <br>
+                                                      <div class="col-sm-8 col-sm-push-4">
+                                                        <button  id=process_input class="btn btn-primary"  type="submit">Create Entry</button>
+                                                      </div>
+
+                                              </div>
+
+                                              <input type="text" hidden class="loginUserID" value ="{{current_user.id}}" size=1  name="loginUserID">
+
+                                        <!-- </form> -->
+                              </div>
+              </div>
+</div>
+
+</body>
+
+    </div>
+</div>
+
+	<script type=text/javascript>
+  $( document ).ready(function() {
+
+
+
+
+    $('#ItemCode').on('change', function()
+    {
+       var ItemId = $('#ItemCode option:selected').val();
+      if( ItemId == 'Select Item' )
+
+      {
+     $('input[name="itemId"]').val('')
+     $('input[name="hsncode"]').val('')
+     $('input[name="hsnpercent"]').val('')
+
+      }
+      if( ItemId != 'Select Item' )
+      {
+          $('input[name="itemId"]').val($('#ItemCode option:selected').val())
+          $('input[name="itemdesc"]').val('')
+
+          ItemId      =   $('input[name="itemId"]').val();
+          $.getJSON(
+              '/getHSNCodePercentage',{
+                ItemId  : ItemId,
+              },
+              function(data) {
+                $('input[name="hsncode"]').val(data.code)
+                $('input[name="hsnpercent"]').val(data.percent)
+
+              }
+            );
+      }
+
+
+    });
+
+     $('#process_input').click(function() {
+
+      var itemCode  =   $('input[name="itemId"]').val().trim();
+      var hsncode      =   $('input[name="hsncode"]').val().trim();
+      var quantity     =   $('input[name="quantity"]').val().trim();
+      var hsnpercent  =   $('input[name="hsnpercent"]').val().trim();
+      var quantity  =   $('input[name="quantity"]').val().trim();
+      var rate  =   $('input[name="rate"]').val().trim();
+      var comments  =   $('input[name="comments"]').val().trim();
+      var creatorID  =   $('input[name="loginUserID"]').val().trim();
+
+      var ItemId = $('#ItemCode option:selected').val();
+      var uom = $('#uom option:selected').val();
+
+      if (! $.isNumeric(hsnpercent))
+      {
+        showErrorMessage("Please enter numeric value for percentage ")
+        return false;
+      }
+      if (! $.isNumeric(hsnpercent))
+      {
+        showErrorMessage("Please enter numeric value for percentage ")
+        return false;
+      }
+      if (! $.isNumeric(quantity))
+      {
+        showErrorMessage("Please enter numeric value for quantity ")
+        return false;
+      }
+      if (! $.isNumeric(rate))
+      {
+        showErrorMessage("Please enter numeric value for rate ")
+        return false;
+      }
+      if (ItemId == 'Select Item'  ||  hsncode == '' |  hsnpercent == ''  || quantity == '' || uom == 'Select Unit Of Measurement' )
+                {
+
+                  showErrorMessage("HSN Code, Percentage, quantity and  Unit Of Measurement are  mandatory")
+                  return false;
+
+                }
+                else {
+                  $("#process_input").attr("disabled", true);
+                  $.getJSON(
+                                  // '/placeTradeInExchange',{
+                                  '/tradelogic/business/createInventory',{
+                                    // symbol  : instrumentText+'.r',
+                                    itemCode : itemCode,
+                                    hsncode  : hsncode,
+                                    quantity  : quantity,
+                                    comments  : comments,
+                                    uom  : uom,
+                                    creatorID : creatorID,
+                                    rate : rate,
+                                  },
+                                  function(data)
+                                   {
+                                      window.location.href = '/display_SubmitConfirm?submitMessage='+data.result
+                                    }
+                            );
+                }
+
+          });
+
+///function showErrorMessage
+          function showErrorMessage(errorMessage){
+
+          $.confirm({
+                         title: 'Encountered an error!',
+                         content: errorMessage,
+                         type: 'red',
+                         typeAnimated: true,
+                         buttons: {
+                             tryAgain: {
+                                 text: 'OK',
+                                 btnClass: 'btn-red',
+                                 action: function(){
+                                   // $( "#custname" ).focus();
+                                 }
+                             },
+                             close: function () {
+                             }
+                         }
+               });
+          // return false;
+          }
+
+          ///function showErrorMessage
+
+    });
+
+
+
+  </script>
+
+
+
+{%endblock%}

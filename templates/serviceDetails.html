@@ -1,0 +1,525 @@
+
+{%extends "layout.html"%}
+{%block content%}
+<meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:before {
+bottom: .5em;
+}
+.my-custom-scrollbar {
+position: relative;
+height: 200px;
+overflow: auto;
+}
+.table-wrapper-scroll-y {
+display: block;
+}
+ </style>
+
+
+
+
+<div class="home">
+
+  <div  class='jumbotron'>
+<p>Service Checkout Creation</p>
+<div class="form-group">
+  <div class="row" >
+      <div id=sResults style="display:none" class="table-wrapper-scroll-y my-custom-scrollbar">
+                <table height=100 class="table table-bordered table-striped mb-0" id='newTable' border="1" >
+                </table>
+        </div>
+  </div>
+
+<div class="row" >
+            <div class="col-md-3">
+                    <label title='Please enter name to search' width="50%">Enter Name</label>
+                    <input type=text size=15 class="form-control" id='custname'  name=proglang  placeholder="Please enter the customer name to search " >
+                    <br>
+                    <a href=# id=process_input><button class="btn btn-primary" >Search</button></a>
+                    <!-- <a href=# id=getTable><button class="btn btn-primary" >Iterate Table</button></a> -->
+            </div>
+</div>
+<br>
+<div id =mainInfo style="display:none" class="row" >
+
+    <div class="col-md-2">
+    <label >Request Id</label>
+    <input type="text"  class="form-control" name="requestId" readonly>
+    </div>
+
+    <div class="col-md-2">
+        <label for="custId">Customer Name</label>
+        <input type="text" class="form-control" name="custName" readonly>
+        <input type="hidden" class="form-control" name="custId">
+    </div>
+
+
+
+    <div class="col-md-2">
+        <label for="plateNo">Plate No</label>
+        <input type="text" class="form-control" name="plateNo" readonly>
+    </div>
+
+
+    <div class="col-md-2">
+        <label for="vinNo">VIN No</label>
+        <input type="text" class="form-control" name="vinNo" readonly>
+    </div>
+
+
+
+  <div class="col-md-2">
+      <label for="servDesc">Work Desc</label>
+      <input type="text" class="form-control" name="servDesc" readonly>
+  </div>
+  <div class="col-md-2">
+      <label for="servDate">Request Date</label>
+      <input type="text" class="form-control" name="servDate" readonly>
+  </div>
+
+</div>
+
+
+
+<div class="row" class="col-md-4">
+      <table height=100 class="table table-striped" id='serviceTable' border="1" >
+        <tr><td><strong>Service Details</strong></td><td><strong>Comments</strong></td><td><strong>Amount</strong></td>
+        <tr><td><input type="text" class="detail" name="sDetails"></td><td><input type="text" class="comment" name="comments"></td><td><input type="text" class="amt" name="amount">&nbsp; <a href="javascript:void(0);" class="remCF">Remove</a></tr></td>'
+      </table>
+  <a href=# id=dynamicTable><button class="btn btn-primary" >Add row</button></a>
+</div>
+<br>
+                <div class="col-xs-6 col-sm-3 col-md-push-5">
+                  <a href=# id=getValue><button class="btn btn-primary" >Checkout Car</button></a>
+                </div>
+</div>
+
+  </div>
+
+</div>
+
+
+<script>
+     $(document).ready(function() {
+            $(window).load(function() {
+
+         $.getJSON(
+           '/customersnames',
+           function(data) {
+             // Remove old options
+             $('#cNames').find('option').remove();
+             // Add new items
+             $.each(data.custNames, function(key, val) {
+               var option_item = '<option value="' + val.name + '">' + val.name + '</option>'
+               $('#cNames').append(option_item);
+             });
+           }
+         );
+       });
+
+//
+
+/////// for masterCars
+              $(window).load(function() {
+
+              $.getJSON(
+              '/allmastercars',
+              function(data) {
+               // Remove old options
+               $('#mcars').find('option').remove();
+               // Add new items
+               $.each(data.carNames, function(key, val) {
+                 var option_item = '<option value="' + val.Car_id + '">' + val.Car_Model + '</option>'
+                 $('#mcars').append(option_item);
+               });
+
+
+              }
+              );
+              });
+////// for masterCars
+
+//// to get value on change for master cars
+$("#mcars").on('change', function () {
+       $("input[name=carId]").val($('#mcars').val());
+       });
+
+//// to get value on change for master cars
+
+
+//
+
+       $("#cNames").on('change', function () {
+              // alert($('#cNames').val());
+              });
+
+///
+
+//
+               $('#tags').change(function() {
+                $.getJSON(
+                  '/customersnames',
+                  function(data) {
+                    allvalues=[]      // Remove old options
+                    // $('#cNames').find('option').remove();
+                    // Add new items
+                    $.each(data.custNames, function(key, val)
+                              {
+                                  // allvalues.add(val.name)
+                                  allvalues.push(val.name)
+                                  //alert(allvalues)
+
+                                      })
+
+                    $( "#tags" ).autocomplete
+                    ({
+                        source: allvalues
+                      })
+
+                  }
+                );
+              });
+//
+
+/// Added for Search Customer
+$(function() {
+  // $('a#process_input').bind('click', function() {
+     $('a#process_input').click(function() {
+       var name =$('input[name="proglang"]').val()
+
+                   if (name == '')
+                   {
+                                     var errorMessage = 'Please enter name to search'
+                               $.confirm({
+                                                  title: 'Encountered an error!',
+                                                  content: errorMessage,
+                                                  type: 'red',
+                                                  typeAnimated: true,
+                                                  buttons: {
+                                                      tryAgain: {
+                                                          text: 'Try again',
+                                                          btnClass: 'btn-red',
+                                                          action: function(){
+                                                            $( "#custname" ).focus();
+                                                          }
+                                                      },
+                                                      close: function () {
+                                                      }
+                                                  }
+                                        });
+
+                               return false;
+                   }
+                   else
+                   {
+                            var errMsg = "<ul>";
+                            $("div#errMsg").html("");
+                  }
+  $.getJSON('/search_ServiceRequest', {
+    proglang: $('input[name="proglang"]').val(),
+
+      // alert(proglang)
+              }, function(data) {
+                            $("#newTable table").remove();
+                            var trHTML = '';
+                            trHTML='<table  class="table table-striped" ><tr><td><strong>Request Id</strong></td><td><strong>Name</strong></td><td><strong>Plate No</strong></td><td><strong>Vin_No</strong></td><td><strong>Service_Description</strong></td><td><strong>Request Date</strong></td>'
+                              custCount = 0
+                                    $.each(data.result, function(index, element)
+                                    {
+                                      custCount=custCount+1;
+                                        anTag = '<a href="#" class="cname1" title="'+element.Request_Id+'"  data-name="'+element.Request_Id+'">'+element.Request_Id+'</a>'
+                                        trHTML += '<tr><td>' +anTag+ '</td><td>' + element.name + '</td><td>' + element.Plate_No + '</td><td>' + element.Vin_No + '</td><td>' + element.Service_Description + '</td><td>' + element.Service_Date + '</td></tr>';
+
+                                    });
+                                    if(custCount > 0)
+
+                                    {  $('#newTable').append(trHTML);
+                                      $('#sResults').show();
+                                      }
+                                    $( "#totalcount" ).text( custCount )
+
+
+
+                          });
+  return false;
+  });
+
+  //////
+
+            $( document ).ready(function() {
+              $(document).on("click", "a.cname1" , function() {
+                var name = $(this).data('name',);
+                 event.preventDefault();
+                $.get("/get_ServiceRequest_info", {'query': name}).done(function (data)
+                {
+                  $('#mainInfo').show();
+                  $("input[name=requestId]").val(data.requestId);
+                  $("input[name=custName]").val(data.name);
+                  $("input[name=vinNo]").val(data.vinno);
+                  $("input[name=plateNo]").val(data.plateno);
+                  $("input[name=servDesc]").val(data.servdesc);
+                  $("input[name=servDate]").val(data.servDate);
+
+
+                    });
+                    });
+
+              });
+////////////
+
+/// for dynamic table a#dynamicTable
+$('a#dynamicTable').click(function(){
+  var trHTML = '';
+  // trHTML='<table  class="table table-striped" ><tr><td><strong>Service Details</strong></td><td><strong>Comments</strong></td><td><strong>Amount</strong></td>'
+  trHTML += '<tr><td><input type="text" class="details"   name="sDetails"></td><td><input type="text" class="comment" name="comments"></td><td><input type="text" class="amt" name="amount">&nbsp; <a href="javascript:void(0);" class="remCF">Remove</a></td>'
+  $('#serviceTable').append(trHTML);
+  sumAmount()
+
+});
+
+$("#serviceTable").on('click','.remCF',function(){
+        $(this).parent().parent().remove();
+         sumAmount()
+    });
+
+///////for dynamic table
+
+
+///========= For numeric input on amount field
+jQuery('.amt').keyup(function () {
+    // this.value = this.value.replace(/[^0-9\.]/g,'');
+    this.value = this.value.match(/^\d+\.?\d{0,2}/);
+});
+
+
+
+$(document).on('keyup', '.amt', function () {
+  jQuery('.amt').keyup(function () {
+      // this.value = this.value.replace(/[^0-9\.]/g,'');
+    this.value = this.value.match(/^\d+\.?\d{0,2}/);
+  });
+});
+
+///========= For numeric input on amount field
+
+
+//
+
+function getAllTableValues() {
+
+  var requestId =$('input[name="requestId"]').val()
+
+  if( requestId == '')
+  {
+
+    showErrorMessage("Main Service Request not selected")
+     return false;
+  }
+
+
+  $('#serviceTable tr').each(function(){
+    var inputs = $(this).find('input'),o={};
+    inputs.each(function(){
+       // o[$(this).attr('detail')]=this.value;
+       var inputField = (this.value).trim()
+
+       if (inputField == "") {
+         showErrorMessage("Enter All fields in service details are mandatory")
+         // alert('Enter All fields')
+         return false;
+       }
+    });
+
+    // objs.push(o);
+  });
+
+}
+
+ $('a#getTable').click(function() {
+
+// // var objs=[];
+// $('#serviceTable tr').each(function(){
+//   var inputs = $(this).find('input'),o={};
+//   inputs.each(function(){
+//      // o[$(this).attr('detail')]=this.value;
+//      var inputField = (this.value).trim()
+//
+//      if (inputField == "") {
+//        alert('Enter All fields')
+//        return false;
+//      }
+//   });
+//
+//   // objs.push(o);
+// });
+
+
+getAllTableValues()
+
+
+ });
+
+
+//
+
+/// Add the Amount column from the table
+
+ $("#serviceTable").on('input', '.amt', function () {
+
+   var calculated_total_sum = 0;
+ $('#texs').remove();
+   $("#serviceTable .amt").each(function () {
+       var get_textbox_value = $(this).val();
+
+       if ($.isNumeric(get_textbox_value)) {
+          calculated_total_sum += parseFloat(get_textbox_value);
+          }
+        });
+        trHTML = '<tr id ="texs"><td></td><td></td><td>Total :'+calculated_total_sum+'</td></tr>'
+
+        $('#serviceTable').append(trHTML);
+
+             });
+
+
+
+/// Add the Amount column from the table
+
+
+
+
+/// new function
+function sumAmount() {
+  var calculated_total_sum = 0;
+  $('#texs').remove();
+  $("#serviceTable .amt").each(function () {
+      var get_textbox_value = $(this).val();
+
+      if ($.isNumeric(get_textbox_value)) {
+         calculated_total_sum += parseFloat(get_textbox_value);
+         }
+       });
+       trHTML = '<tr id ="texs"><td></td><td></td><td>Total :'+calculated_total_sum+'</td></tr>'
+
+       $('#serviceTable').append(trHTML);
+  }
+
+// new function
+
+
+// get allvalues
+function getserviceDetails() {
+var details=new Array();
+var comments=new Array();
+var amount=new Array();
+
+$('#serviceTable input[type="text"]').each(function () {
+
+    if($(this).attr('name')=="sDetails")
+        details.push($(this).val())
+
+    if($(this).attr('name')=="comments")
+        comments.push($(this).val())
+
+
+    if($(this).attr('name')=="amount")
+        amount.push($(this).val())
+
+ });
+//alert(amount)
+ // return { det : details, comm : comments, amt = amount };
+ return {  details,  comments,  amount };
+}
+// get allvalues
+
+
+//------------
+$('a#getValue').click(function(){
+  // var requestId =$('input[name="requestId"]').val()
+
+  // if( requestId == '')
+  // {
+  //
+  //   showErrorMessage("Main Service Request not seleceted")
+  // }
+getAllTableValues();
+
+ allValues = getserviceDetails(),
+
+ details = allValues.details,
+comments = allValues.comments,
+amount  = allValues.amount,
+
+
+$.getJSON('/create_serviceDetails', {
+
+   sDetails: JSON.stringify(details),
+   sComments : JSON.stringify(comments),
+   sAmount : JSON.stringify(amount),
+ sRequestId : $('input[name="requestId"]').val(),
+            }, function(data) {
+
+
+window.location.href = '/display_ServiceDetail?message='+data.result
+//window.location.href = '/generate_ServiceDetailPDF?message='+data.result
+                        });
+
+return false;
+});
+//------------
+
+
+
+//// tooltip function
+$( function() {
+$( document ).tooltip();
+} );
+///////
+
+});
+
+/// Added for Search Customer
+
+function showErrorMessage(errorMessage){
+
+  // var errorMessage = 'Please enter name to search'
+$.confirm({
+               title: 'Encountered an error!',
+               content: errorMessage,
+               type: 'red',
+               typeAnimated: true,
+               buttons: {
+                   tryAgain: {
+                       text: 'OK',
+                       btnClass: 'btn-red',
+                       action: function(){
+                         // $( "#custname" ).focus();
+                       }
+                   },
+                   close: function () {
+                   }
+               }
+     });
+
+return false;
+}
+
+
+
+     });
+
+   </script>
+
+{%endblock%}

@@ -1,0 +1,136 @@
+{%extends "layout.html"%}
+{%block content%}
+<div class="home">
+    <p>View All Customers</p>
+</div>
+
+		<script type=text/javascript>
+			$(function() {
+
+           $('a#process_input').click(function() {
+             var name =$('input[name="customername"]').val()
+
+             if (name == '') {
+                     var errorMessage = 'Please enter name to search'
+                       $.confirm({
+                                          title: 'Encountered an error!',
+                                          content: errorMessage,
+                                          type: 'red',
+                                          typeAnimated: true,
+                                          buttons: {
+                                              tryAgain: {
+                                                  text: 'Try again',
+                                                  btnClass: 'btn-red',
+                                                  action: function(){
+                                                    $( "#custname" ).focus();
+                                                  }
+                                              },
+                                              close: function () {
+                                              }
+                                          }
+                                });
+
+               return false;
+             }
+             else
+             {
+                        var errMsg = "<ul>";
+                        $("div#errMsg").html("");
+                    }
+				$.getJSON('/searchCustomers', {
+				  customername: $('input[name="customername"]').val(),
+
+				}, function(data) {
+
+                    $("#newTable table").remove();
+                    var trHTML = '';
+                        trHTML='<table class="table table-striped" ><tr><td><strong>Customer Id</strong></td><td><strong>Name</strong></td><td><strong>E Mail</strong></td>'
+                      custCount = 0
+                              $.each(data.result, function(index, element)
+                                    {
+                                      custCount=custCount+1;
+                                        anTag = '<a href="#" class="cname1" title="'+element.Customer_Name+'"  data-name="'+element.Customer_Name+'">'+element.Customer_ID+'</a>'
+                                                      trHTML += '<tr><td>' +anTag+ '</td><td>' + element.Customer_Name + '</td><td>' + element.Customer_Email + '</td></tr>';
+
+                                    }
+                                  );
+                              if(custCount > 0)
+                              {  $('#newTable').append(trHTML);}
+
+                              $( "#totalcount" ).text( custCount )
+
+				             });
+				return false;
+			  });
+
+        //////
+
+          $( document ).ready(function() {
+            $(document).on("click", "a.cname1" , function() {
+              var name = $(this).data('name',);
+               event.preventDefault();
+              $.get("/get_customer_info", {'query': name}).done(function (data)
+              {
+                $('#displaycust').show();
+                          $('#custId1').val(data.custidj);
+                          $('#custName1').val(data.custnamej);
+                          $('#custmobile1').val(data.custmobilej);
+                          $('#emailid1').val(data.custemailj);
+                          $('#emailid1').val(data.custaddressj);
+                  });
+                  });
+
+            });
+      ////////////
+
+
+//// tooltip function
+$( function() {
+    $( document ).tooltip();
+  } );
+///////
+
+			});
+
+
+		</script>
+
+	</head>
+<body>
+
+<div class='jumbotron'>
+		<h3>Search Customer</h3>
+    <!-- <div class="container"> -->
+
+                      <button type="button" class="btn btn-primary">
+                          Number of Customers <span  class="badge badge-light"><p id=totalcount></p></span>
+                          <span class="sr-only">unread messages</span>
+                      </button>
+              <br><br>
+          			<form>
+                         <div class="form-group">
+                           <div id="errMsg"></div>
+                          <label title='Please enter name to search' width="50%">Enter Name</label>
+                  				<input type=text size=15 class="form-control" id='custname'  name=customername  placeholder="Please enter the customer name to search " >
+                          <br>
+                          <a href=# id=process_input><button class="btn btn-primary" >Search</button></a>
+                          </div>
+          			</form>
+
+          		<p id=result></p>
+                  <table class="table table-responsive" id='newTable' border="1" >
+                  </table>
+
+              <br>
+                      <div id = displaycust style="display:none">
+                                <table  border="1" >
+                                              <tr><td><strong>Customer Number</td><td ><Input width="200px"  id="custId1"  /></td></tr>
+                                              <tr><td><strong>Customer Name</td><td ><Input width="300px"  id="custName1" type="text"/> </td></tr>
+                                              <tr><td><strong>Mobile No</td><td ><Input width="100px"  id="custmobile1"  /></td></tr>
+                                              <tr><td><strong>Email</td><td ><Input width="300px"  id="emailid1"  /></td></tr>
+                                </table>
+                      </div>
+		     <!-- </div> -->
+   </div>
+	</body>
+{%endblock%}

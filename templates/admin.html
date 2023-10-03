@@ -1,0 +1,34 @@
+{%extends "layout.html"%}
+{%block content%}
+{% include 'cssfile.html' %}
+
+<div class="admin">
+<div class='jumbotron'>
+<div class="container">
+<div class="sidenav">
+  <a id=submit_data href="#about">Clients Entry</a>
+  <a id=services href="#services">Clients Account</a>
+  <a href="#clients">View Clients</a>
+  <a href="#contact">View Clients Account Details</a>
+
+</div>
+
+<iframe name="abc_frame"  src="showClientEntry" height="800" frameBorder="0" width="100%" ></iframe>
+</div>
+</div>
+</div>
+
+<script type=text/javascript>
+/// submit form
+$('a#submit_data').click(function(){
+  window.open('showClientEntry', "abc_frame");
+
+});
+
+$('a#services').click(function(){
+  window.open('showClientAccEntry', "abc_frame");
+
+});
+</script>
+
+{%endblock%}

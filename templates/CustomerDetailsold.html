@@ -1,0 +1,179 @@
+{%extends "layout.html"%}
+{%block content%}<head>
+
+<div class="admin">
+<div class='jumbotron'>
+<div class="container">
+<p style="color:blue;">Client Details</p>
+<form method="POST" action="/createClientDetails">
+
+            <div class="row" >
+                  <!-- <div class="row"> -->
+                      <div class="col-md-5">
+                          <label class="font-weight-bold" for="symbol">Customer Name</label>
+                          <input class="form-control" type="text" size="5" name="name" maxlength="100" placeholder="Enter Name" >
+                      </div>
+
+                      <div class="col-md-5">
+                        <label class="font-weight-bold" for="symbolext">Client Mobile No</label>
+                          <input class="form-control" type="text" name="phno" maxlength="40" placeholder="Enter Contact No" >
+                      </div>
+
+            </div>
+
+  <div class="row" >
+        <!-- <div class="row"> -->
+            <div class="col-md-5">
+                <label class="font-weight-bold" for="email">E-mail</label>
+                <input class="form-control" type="email"  name="email" maxlength="40" placeholder="Enter E Mail" >
+            </div>
+
+            <div class="col-md-5">
+              <label class="font-weight-bold" for="address">Address</label>
+                <input class="form-control" type="text" name="address" maxlength="50" placeholder="Enter Address" >
+            </div>
+
+  </div>
+
+  <div class="row" >
+        <!-- <div class="row"> -->
+            <div class="col-md-5">
+                <label class="font-weight-bold" for="bankname">Bank Name</label>
+                <input class="form-control" type="text"  name="bankname" maxlength="30" placeholder="Enter Branche" >
+            </div>
+
+            <div class="col-md-5">
+              <label class="font-weight-bold" for="bankbranch">Bank Branch</label>
+                <input class="form-control" type="text" name="bankbranch" maxlength="30" placeholder="Enter Bank Code" >
+            </div>
+
+  </div>
+  <div class="row" >
+        <!-- <div class="row"> -->
+              <div class="col-md-5">
+                  <label class="font-weight-bold" for="ifsccode">IFSC Code</label>
+                  <input class="form-control" type="text"  name="ifsccode" maxlength="30" placeholder="Enter IFSC Code" >
+              </div>
+
+            <div class="col-md-5">
+              <label class="font-weight-bold" for="accno">Account No</label>
+                <input class="form-control" type="text" name="accno" maxlength="50" placeholder="Enter Account No" >
+            </div>
+
+  </div>
+  <div class="row" >
+        <!-- <div class="row"> -->
+            <div class="col-md-5">
+              <label for="comments">Comments</label>
+               <textarea class="form-control" name="comments" rows="3"></textarea>
+            </div>
+
+
+  </div>
+
+
+  <br>
+              <div class="row">
+                <br>
+                  <div class="col-xs-6 col-sm-1 col-md-push-4">
+                    <a href=# id=process_input><button  class="btn btn-primary" ><span class="glyphicon glyphicon-th-list"></span>&nbsp;Create Customer Details</button></a>
+
+                  </div>
+
+              </div>
+
+
+
+  <input type="text" hidden class="loginUserID" value ="{{current_user.id}}" size=1  name="loginUserID">
+
+<br>
+
+
+</form>
+
+</div>
+</div>
+</div>
+
+<script type=text/javascript>
+
+$( document ).ready(function() {
+   $('#process_input').click(function() {
+
+    var name            =   $('input[name="name"]').val().trim();
+    var phno            =   $('input[name="phno"]').val().trim();
+    var email           =   $('input[name="email"]').val().trim();
+    var bankname        =   $('input[name="bankname"]').val().trim();
+    var brnchname       =  $('input[name="bankbranch"]').val().trim();
+    var accno           =   $('input[name="accno"]').val().trim();
+    var ifsccode        =   $('input[name="ifsccode"]').val().trim();
+    var comments        =   $('input[name="comments"]').val().trim();
+
+alert('')
+    active ='No'
+    if (name == ''  ||  phno == ''  || email == ''  || bankname == ''
+            || brnchname == '' || accno == '' || ifsccode == '' || comments == ''
+        )
+
+            {
+                var errorMessage = 'Please enter all fields to signup'
+
+                  $.confirm({
+                                     title: 'Encountered an error!',
+                                     content: errorMessage,
+                                     type: 'red',
+                                     typeAnimated: true,
+                                     buttons: {
+                                         tryAgain: {
+                                             text: 'Try again',
+                                             btnClass: 'btn-red',
+                                             action: function(){
+                                               // $( "#custname" ).focus();
+                                             }
+                                         },
+                                         close: function () {
+                                         }
+                                     }
+                           });
+                           return false;
+              }
+
+
+              if ($('#active').is(":checked"))
+              {
+                active = 'Yes'
+              }
+              else {
+                showErrorMessage("Please select Active")
+                return false;
+              }
+        });
+        ///function showErrorMessage
+
+        function showErrorMessage(errorMessage){
+
+        $.confirm({
+                       title: 'Encountered an error!',
+                       content: errorMessage,
+                       type: 'red',
+                       typeAnimated: true,
+                       buttons: {
+                           tryAgain: {
+                               text: 'OK',
+                               btnClass: 'btn-red',
+                               action: function(){
+                                 // $( "#custname" ).focus();
+                               }
+                           },
+                           close: function () {
+                           }
+                       }
+             });
+        // return false;
+        }
+
+        ///function showErrorMessage
+  });
+
+</script>
+{%endblock%}

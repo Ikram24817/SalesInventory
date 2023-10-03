@@ -1,0 +1,153 @@
+{%extends "layout.html"%}
+{%block content%}
+<div  class='jumbotron'>
+    <div class="form-group">
+            <div class="column is-4 is-offset-4">
+                <h3 class="title">Sign Up</h3>
+                <div class="box">
+                  {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                <div  class="text-danger">
+                  <b>  {{ messages[0] }}. Go to <a href="{{ url_for('login') }}">login page</a>. </b>
+                </div>
+                <br>
+                {% endif %}
+                {% endwith %}
+
+                    <form method="POST" action="/signup_post">
+
+                      <div class="row" >
+                            <!-- <div class="row"> -->
+                                <div class="col-md-5">
+                                    <label class="font-weight-bold" for="firstname">First Name</label>
+                                    <input class="form-control" type="text" name="firstname" maxlength="15" placeholder="First Name" autofocus="">
+                                </div>
+                            <!-- </div> -->
+
+
+                            <!-- <div class="row"> -->
+                                <div class="col-md-5">
+                                  <label class="font-weight-bold" for="lastname">Last Name</label>
+                                    <input class="form-control" type="text" name="lastname" maxlength="15" placeholder="Last Name" autofocus="">
+                                </div>
+                            <!-- </div> -->
+                      </div>
+
+              <div class="row">
+                      <!-- <div class="row"> -->
+                          <div class="col-md-5">
+                                <label class="font-weight-bold" for="email">E-mail</label>
+                                <input class="form-control" type="email" name="email" maxlength="30" placeholder="Email" required= True autofocus="">
+                            </div>
+                        <!-- </div> -->
+
+
+                        <!-- <div class="row"> -->
+                            <div class="col-md-5">
+                              <label class="font-weight-bold" for="username">User Name</label>
+                                <input class="form-control" type="text" name="username" maxlength="10" placeholder="User Name" autofocus="">
+                            </div>
+                        <!-- </div> -->
+                </div>
+
+                        <br>
+                <div class="row">
+                        <!-- <div class="row"> -->
+                            <div class="col-md-5">
+                                <label class="font-weight-bold" for="password">Password</label>
+                                <input class="form-control" type="password" name="password" maxlength="12" placeholder="Password">
+                            </div>
+                        <!-- </div> -->
+
+                        <!-- <div class="row"> -->
+                            <div class="col-md-5">
+                                <label class="font-weight-bold" for="confpassword">Repeat Password</label>
+                                <input class="form-control" type="password" name="confpassword" maxlength="12" placeholder="Password">
+                            </div>
+                        <!-- </div> -->
+              </div>
+                        <br>
+                       <div class="text-center">  <button id=process_input  class="btn btn-primary">Sign Up</button> </div>
+                    </form>
+                </div>
+            </div>
+
+
+  </div>
+</div>
+
+<script type=text/javascript>
+
+$( document ).ready(function() {
+   $('#process_input').click(function() {
+    var email         =   $('input[name="email"]').val().trim();
+    var firstname     =   $('input[name="firstname"]').val().trim();
+    var lastname      =   $('input[name="lastname"]').val().trim();
+    var username      =   $('input[name="username"]').val().trim();
+    var password      =  $('input[name="password"]').val().trim();
+    var confpassword  =   $('input[name="confpassword"]').val().trim();
+
+    if (email == ''  ||  firstname == ''  || lastname == ''  || username == ''
+            || password == '' || confpassword == ''   )
+              {
+                var errorMessage = 'Please enter all fields to signup'
+
+                  $.confirm({
+                                     title: 'Encountered an error!',
+                                     content: errorMessage,
+                                     type: 'red',
+                                     typeAnimated: true,
+                                     buttons: {
+                                         tryAgain: {
+                                             text: 'Try again',
+                                             btnClass: 'btn-red',
+                                             action: function(){
+                                               $( "#custname" ).focus();
+                                             }
+                                         },
+                                         close: function () {
+                                         }
+                                     }
+                           });
+                           return false;
+              }
+
+              else if (password != confpassword)
+              {
+                $.confirm({
+                                   title: 'Encountered an error!',
+                                   content: "Password and Confirm Password do not match",
+                                   type: 'red',
+                                   typeAnimated: true,
+                                   buttons: {
+                                       tryAgain: {
+                                           text: 'Try again',
+                                           btnClass: 'btn-red',
+                                           action: function(){
+                                             $( "#password" ).focus();
+                                           }
+                                       },
+                                       close: function () {
+                                       }
+                                   }
+                         });
+                         return false;
+              }
+
+              else {
+                return true
+              }
+
+
+        });
+
+  });
+
+</script>
+
+
+
+
+
+
+{%endblock%}

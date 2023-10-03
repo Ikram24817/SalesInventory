@@ -1,0 +1,186 @@
+{%extends "layout.html"%}
+{%block content%}
+<br>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+  <div  class='jumbotron' style="background-color:#e1dfed;">
+    <p style="color:blue;">Payments Recieved</p>
+        <title>Sales Order</title>
+        <table style="background-color:#e1dfed;" class="table table-borderless table-light">
+          <tr>
+          <td width =140px ><label>Enter Customer ID</label></td>
+          <td width =200px><input type=number size=4 class="form-control" id='customerId'  name=customerId ></td>
+          <td><a href=# ><button  id =searchCust  class="btn btn-primary" >Search</button></a></td>
+          </tr>
+      </table>
+
+      <table width =300px class="table table-borderless table-light" id='newTable' >
+      </table>
+      <table  class="table table-borderless table-light" id='payment' >
+      </table>
+      <table  class="table table-borderless table-light" id='paymentreceived' >
+      </table>
+  </div>
+
+
+  </body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+
+$( document ).ready(function(){
+
+  $('#searchCust').click(function()
+  {
+    $("#newTable table").remove();
+    $("#payment table").remove();
+    $("#paymentreceived table").remove();
+    var customerId =$('input[name="customerId"]').val().trim()
+    if (customerId == '') {
+      showErrorMessage("Please enter customer ID to search")
+      return false;
+          }
+          else
+          {
+                     var errMsg = "<ul>";
+                     $("div#errMsg").html("");
+                 }
+          // else {
+            $.getJSON('/getAllPaymentsByCustomerID', {
+              customerId: customerId,
+
+            }, function(data) {
+if(data.customerDetails == '')
+{
+  showErrorMessage("customer ID not found")
+  return false;
+}
+
+if(data.paymentAmount == '')
+{
+  paymentAmount = "No Payments Received"
+}
+else {
+  paymentAmount = data.paymentAmount
+}
+
+
+
+
+                        var trHTML = '';
+                            trHTML='<table class="table table-striped" ><table class="table table-striped" ><table class="table table-striped" ><tr><td><strong>Customer Id</strong></td><td><strong>Name</strong></td>'
+
+                      var trHTML1 = '';
+                          trHTML1='<table class="table table-striped" ><table class="table table-striped" ><tbody ><tr><td><strong>Sales Id</strong></td><td><strong>Total</strong></td>'
+
+                      var trHTML2 = '';
+                          trHTML2='<table class="table table-striped" ><tr><td><strong>Payments Received</strong></td>'
+
+                          custCount = 0
+
+
+
+                          $.each(data.SalesInvoiceAmount, function(index, element)
+                                {
+                                  custCount=custCount+1;
+                                    // anTag = '<a href="#" class="cname2" title="'+element.Sales_Req_Id+'"  data-name="'+element.Sales_Req_Id+'">'+element.Sales_Req_Id+'</a>'
+                                                  trHTML1 += '<tr><td>' +element.Sales_Req_Id+ '</td><td>' + element.Total + '</td></tr>';
+
+
+                                }
+                                  );
+                                    trHTML1 +='</tbody>'
+                                      trHTML1 += '<tr id ="texs"><td></td><td>Total:'+data.nettTotal+'</td></tr>'
+                                    if(custCount > 0)
+                                    {  $('#payment').append(trHTML1);}
+
+                                      trHTML2 += '<tr id ="texs"><td>Total:'+data.paymentAmount+'</td></tr>'
+                                      balance = data.nettTotal - data.paymentAmount
+                                      if(data.nettTotal > data.paymentAmount)
+                                      {
+                                        balText = 'Balance Payment'
+                                        balanceAmt = data.nettTotal - data.paymentAmount
+                                      }
+                                      if(data.nettTotal < data.paymentAmount)
+                                      {
+                                        balText = 'Extra Payment'
+                                        balanceAmt = data.paymentAmount - data.nettTotal
+                                      }
+                                      trHTML2 += '<tr id ="texs"><td>'+balText+' ' +(balanceAmt)+'</td></tr>'
+                                    $('#paymentreceived').append(trHTML2);
+
+                                  $.each(data.customerDetails, function(index, element)
+                                        {
+                                          // alert(element.Customer_Name)
+                                          custCount=custCount+1;
+                                            anTag = ''+element.Customer_Id+''
+                                                          trHTML += '<tr><td>' +anTag+ '</td><td>' + element.Customer_Name + '</td></tr>';
+
+                                        }
+                                      );
+                                      trHTML +=' '
+                                      if(custCount > 0)
+                                      {  $('#newTable').append(trHTML);}
+
+
+                         });
+
+              return false;
+        });
+
+});
+
+
+///function showErrorMessage
+          function showErrorMessage(errorMessage){
+
+          $.confirm({
+                         title: 'Encountered an error!',
+                         content: errorMessage,
+                         type: 'red',
+                         typeAnimated: true,
+                         buttons: {
+                             tryAgain: {
+                                 text: 'OK',
+                                 btnClass: 'btn-red',
+                                 action: function(){
+                                   // $( "#custname" ).focus();
+                                 }
+                             },
+                             close: function () {
+                             }
+                         }
+               });
+
+          }
+
+          ///function showErrorMessage
+
+</script>
+
+
+
+
+
+
+
+
+
+
+{%endblock%}
